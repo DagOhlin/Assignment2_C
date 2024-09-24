@@ -179,6 +179,48 @@ void list_delete(Node** head, int data){
     
 }
 
+int list_count_nodes(Node** head){
+
+    if(*head == NULL){
+        return 0;
+    }
+
+    Node* current = *head;
+    int amount = 1;
+
+    while(current->next != NULL){
+
+        current = current->next;
+
+        amount++;
+
+    }
+
+    return amount;
+
+}
+
+void list_cleanup(Node** head){
+
+    if(*head == NULL){
+        return;
+    }
+
+    Node* current = *head;
+    
+    while(current != NULL){
+        Node* delete = current;
+        
+
+        current = current->next;
+
+        mem_free(delete);
+
+    }
+
+    *head = NULL;
+}
+
 //------------------display funks------------------
 
 void list_display(Node** head){
@@ -204,9 +246,9 @@ void list_display(Node** head){
 
 
 }
-/*
 
-void list_display(Node** head, Node* start_node, Node* end_node){
+
+void list_display_range(Node** head, Node* start_node, Node* end_node){
 
     if(start_node == 0){
         start_node = *head;
@@ -216,31 +258,23 @@ void list_display(Node** head, Node* start_node, Node* end_node){
     }
 
     printf("[");
-    Node* current = *head;
+    Node* current = start_node;
+    bool isFIrst = true;
     bool startPrinting = false;
 
-    while (current != NULL) {
+     while (current != NULL) {
         
-        if (!startPrinting && current == start_node) {
-            startPrinting = true;
+        if (!isFIrst) {
+            printf(", ");
+        }
+        printf("%d", current->data);
+        isFIrst = false;
+
+        
+        if (current == end_node) {
+            break;
         }
 
-        
-        if (startPrinting) {
-            printf("%d", current->data);
-
-            
-            if (current->next != NULL && current->next != end_node) {
-                printf(", ");
-            }
-
-            
-            if (current == end_node) {
-                break;
-            }
-        }
-
-       
         current = current->next;
     }
 
@@ -249,7 +283,7 @@ void list_display(Node** head, Node* start_node, Node* end_node){
     printf("]");
 
 }
-*/
+
 
 /*
 int main(){
