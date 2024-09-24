@@ -42,19 +42,17 @@ void increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
     *array = temp;
 }
 
-size_t sizeLeftAtEndOfPool(){
-
-    size_t size = 0; 
-
-    for (int i = 0; i < memoryBlocksSize; i++)
-    {
-        size += memoryBlocks[i].size;
+size_t sizeLeftAtEndOfPool() {
+    if (memoryBlocksSize == 0) {
+        
+        return memPoolSize;
+    } else {
+       //om du glömt bort castar du till char för att en char är en byte och det är nödvändigt för att räkna med bytes
+       //vet ej dock om det behövs just här 
+        memoryBlock lastBlock = memoryBlocks[memoryBlocksSize - 1];
+        size_t usedSize = (char*)lastBlock.startAdress + lastBlock.size - (char*)memPoolStart;
+        return memPoolSize - usedSize;
     }
-    
-    size = memPoolSize  - size;
-
-    return size;
-
 }
 
 void mem_init(size_t size){
