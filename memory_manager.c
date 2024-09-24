@@ -203,7 +203,7 @@ void* mem_alloc(size_t size){
 
                     }
 
-                    
+                    memoryBlocks[i + 1].startAdress = (char*)memoryBlocks[i].startAdress + size;
                     memoryBlocks[i + 1].size = memoryBlocks[i].size - size;
                     memoryBlocks[i + 1].isUsed = false;
                     memoryBlocks[i].size = size;
