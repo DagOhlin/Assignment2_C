@@ -113,11 +113,11 @@ void mem_free(void* block){
     memoryBlocks[index].isUsed = false;
 
     if(index > 0 && memoryBlocks[index - 1].isUsed == false){
-
-        printf("found previus block to combine with\n");
+        printf("found previous block to combine with\n");
 
         memoryBlocks[index - 1].size += memoryBlocks[index].size;
 
+        // Shift the remaining blocks left
         for (int i = index; i < memoryBlocksSize - 1; i++)
         {
             memoryBlocks[i] = memoryBlocks[i + 1];
@@ -126,24 +126,27 @@ void mem_free(void* block){
         memoryBlocksSize--;
 
         index--;
-        
 
-
+    
     }
 
-    if(index < memoryBlocksSize && memoryBlocks[index + 1].isUsed == false){
+    
+    if(index < memoryBlocksSize - 1 && memoryBlocks[index + 1].isUsed == false){
         printf("found next block to combine with\n");
 
         memoryBlocks[index].size += memoryBlocks[index + 1].size;
 
+        
         for (int i = index + 1; i < memoryBlocksSize - 1; i++)
         {
             memoryBlocks[i] = memoryBlocks[i + 1];
         }
 
         memoryBlocksSize--;
-        
+
+    
     }
+
 
 }
 
