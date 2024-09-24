@@ -250,12 +250,10 @@ void list_display(Node** head){
 
 void list_display_range(Node** head, Node* start_node, Node* end_node){
 
-    if(start_node == 0){
+    if(start_node == NULL){
         start_node = *head;
     }
-    if(end_node == -1){
-        end_node = NULL;
-    }
+    
 
     printf("[");
     Node* current = start_node;
