@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "memory_manager.h"
 #include"common_defs.h"
+#include <string.h>
+
 //make sure the stddef works on linux there are dirrerent printing of size_t for different OS AAAAA
 #include <stddef.h>
 /*
