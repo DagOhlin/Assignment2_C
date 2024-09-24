@@ -1,0 +1,45 @@
+# Ignore object files and compiled binaries
+*.o
+*.obj
+*.exe
+*.out
+*.app
+*.dll
+*.so
+*.dylib
+
+# Ignore core dump files
+core
+
+# Ignore compiled static and dynamic libraries
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+# Ignore debug logs and temporary files
+*.log
+*.stackdump
+*.dmp
+
+# Ignore temporary files created by editors and IDEs
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Ignore auto-generated files from CMake or Make (if applicable)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Ignore build directories
+build/
+bin/
+dist/
+
+# Ignore backup and temporary files
+*.bak
+*.tmp
