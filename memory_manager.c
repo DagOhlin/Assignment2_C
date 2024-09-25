@@ -202,7 +202,7 @@ void* mem_alloc(size_t size){
                         }
 
                     }
-
+                    //same thing here  do not know if the char cast is really nessesary think i do calcs with these elsewhere where i do not use it
                     memoryBlocks[i + 1].startAdress = (char*)memoryBlocks[i].startAdress + size;
                     memoryBlocks[i + 1].size = memoryBlocks[i].size - size;
                     memoryBlocks[i + 1].isUsed = false;
