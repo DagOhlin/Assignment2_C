@@ -15,8 +15,9 @@ typedef struct{
 } Node;
 */
 //------------------interaction funks------------------
-void list_init(Node** head){
+void list_init(Node** head, size_t size){
     printf("*list_init\n");
+    mem_init(sizeof(Node) * 200);
     *head = NULL; 
 
 }
@@ -278,7 +279,7 @@ void list_display_range(Node** head, Node* start_node, Node* end_node){
 
     
     
-    printf("]");
+    printf("]\n");
 
 }
 
