@@ -4,8 +4,9 @@
 #include "memory_manager.h"
 #include"common_defs.h"
 #include <string.h>
-
-//make sure the stddef works on linux there are dirrerent printing of size_t for different OS AAAAA
+// the code can not handle combining a free block and end of pool so i just start with 
+// a free block the size of the pool but the code for a free pool still workes  
+//half of the code is useless now but meh
 #include <stddef.h>
 /*
 typedef struct 
@@ -22,6 +23,15 @@ size_t memPoolSize = 0;
 
 memoryBlock* memoryBlocks = NULL;
 int memoryBlocksSize = 0;
+
+void print_memory_blocks() {
+    printf("Current memory blocks:\n");
+    for (int i = 0; i < memoryBlocksSize; i++) {
+        printf("Block %d: startAdress=%p, size=%zu, isUsed=%s\n", i, memoryBlocks[i].startAdress, memoryBlocks[i].size, memoryBlocks[i].isUsed ? "true" : "false");
+    }
+}
+
+
 
 void increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
@@ -68,10 +78,15 @@ void mem_init(size_t size){
     }
     memPoolStart = temp;
 
+    //new code for startfull test below 
+
+    memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock));
+    memoryBlocksSize += 1;
+    memoryBlocks[memoryBlocksSize - 1].size = size;
+    memoryBlocks[memoryBlocksSize - 1].isUsed = false;
+    memoryBlocks[memoryBlocksSize - 1].startAdress = memPoolStart;
+
 }
-
-
-
 
 
 void mem_free(void* block){
@@ -259,8 +274,9 @@ void mem_deinit(){
 
 
 void* mem_resize(void* block, size_t size){
-    //this can so far only increase the size of the block 
+    
     printf("mem_resize\n");
+
     int blockIndex;
 
     for (int i = 0; i < memoryBlocksSize; i++)
@@ -273,36 +289,69 @@ void* mem_resize(void* block, size_t size){
 
         }
     }    
-    // what would i return if i failed to find a block with that adress 
+
     if(memoryBlocks[blockIndex].size == size){
         printf("block was already that size\n");
         return block; 
     }
 
-    
-    //here should be a check for if the new size is smaller but no way to fix the gap in blox that would create right now 
 
+    if(memoryBlocks[blockIndex].size < size){
+        printf("new size is larger than old one\n");
+        if(blockIndex < memoryBlocksSize - 1 && memoryBlocks[blockIndex + 1].isUsed == false 
+        && memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size >= size){
+            printf("the next block is free and new size can fit in the two combined\n");
+            
+            memoryBlocks[blockIndex + 1].size = memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size - size;
+            memoryBlocks[blockIndex].size = size;
+            
+            return block;
+            //this risks creating 0 size blocks which should be fine and will disaprear with time but will make iteration longer for no reason
+        }
 
-    //ups size of block
-    if(blockIndex == memoryBlocksSize - 1 && size <= sizeLeftAtEndOfPool()){
-        printf("block is last one and end of pool is enough expanding size\n");
-        memoryBlocks[blockIndex].size = size;
-        return block;
+        if(blockIndex == memoryBlocksSize - 1 && size - memoryBlocks[blockIndex].size <= sizeLeftAtEndOfPool()){
+            printf("block is last one and end of pool is enough expanding size\n");
+            memoryBlocks[blockIndex].size = size;
+            return block;
+        }   
+
+        
+        printf("will try to find new block that fits\n");
+
+        void* newBockAdress = mem_alloc(size);
+        if(newBockAdress == NULL){
+            printf("there was no other spot that fit, returns null\n");
+           
+            return NULL;
+        } 
+
+        printf("found new block at new adress\n");
+        memcpy(newBockAdress, block, size);
+        mem_free(block);
+        printf("copied over data and freed old block will now return new adress\n");
+        return newBockAdress;
+        
+
     }
-    printf("looking for new spot for memory\n");
-    void* newBockAdress = mem_alloc(size);
-    if(newBockAdress == NULL){
-        printf("there was no other spot that fit \n");
-        //returning block here for now
-        return block;
+
+    if(memoryBlocks[blockIndex].size > size){
+        //unnessesary if, I know
+        printf("new size is smaller than old one freeing block\n");
+        mem_free(block);
+        void* newBlock = mem_alloc(size);
+
+        if(newBlock == block){
+            printf("new bock same as old one, just smaller size\n");
+            return block;
+        }
+
+        memcpy(newBlock, block, size);
+        return newBlock;
+        
     }
 
-    printf("found new block at new adress\n");
-    memcpy(newBockAdress, block, memoryBlocks[blockIndex].size);
-    mem_free(block);
-    printf("copied over data and freed old block will now return new adress\n");
-    return newBockAdress;
 
+    return NULL;
 
     
 }
@@ -314,23 +363,29 @@ int main(){
 
     mem_init(100);
 
-    void* x = mem_alloc(40);
-    void* y = mem_alloc(30);
-    void* z = mem_alloc(30);
+    void* x = mem_alloc(80);
+    
+
+    mem_resize(x, 32);
+    print_memory_blocks();
+
+    void* y = mem_alloc(65);
 
     mem_free(x);
-    mem_free(y);
-    //mem_free(z);
 
-    
+    print_memory_blocks();
 
-    void* a = mem_alloc(50);
+    y = mem_resize(y, 2);
+
+    print_memory_blocks();
     
-    printf("The size is: %Iu\n", memoryBlocks[1].size);
-    printf("The size is: %Iu\n", memoryBlocks[2].size);
+    //---
+
     
 
     getchar();
+    
+    return 0;
     
 }
 */
