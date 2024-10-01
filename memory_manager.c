@@ -304,6 +304,20 @@ void* mem_resize(void* block, size_t size){
             
             memoryBlocks[blockIndex + 1].size = memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size - size;
             memoryBlocks[blockIndex].size = size;
+            memoryBlocks[blockIndex + 1].startAdress = memoryBlocks[blockIndex].size + memoryBlocks[blockIndex].startAdress;
+            //should i cast to char here?
+
+            if (memoryBlocks[blockIndex + 1].size == 0)
+            {
+                printf("resize used upp all of both blocks, will remove block with size 0\n");
+                for (int i = blockIndex + 1; i < memoryBlocksSize - 1; i++)
+                {
+                    memoryBlocks[i] = memoryBlocks[i + 1];
+                }
+
+                memoryBlocksSize--;
+            }
+            
             
             return block;
             //this risks creating 0 size blocks which should be fine and will disaprear with time but will make iteration longer for no reason
@@ -356,28 +370,31 @@ void* mem_resize(void* block, size_t size){
     
 }
 
-/*
+
 int main(){
 
     printf("Hello World!\n");
 
     mem_init(100);
 
-    void* x = mem_alloc(80);
+    print_memory_blocks();
+
+    void* x = mem_alloc(50);
+    void* y = mem_alloc(50);
+    mem_free(y);
+
+    print_memory_blocks();
     
 
-    mem_resize(x, 32);
-    print_memory_blocks();
-
-    void* y = mem_alloc(65);
-
-    mem_free(x);
+    mem_resize(x, 80);
 
     print_memory_blocks();
 
-    y = mem_resize(y, 2);
+   
 
-    print_memory_blocks();
+    
+    
+   
     
     //---
 
@@ -388,4 +405,4 @@ int main(){
     return 0;
     
 }
-*/
+
