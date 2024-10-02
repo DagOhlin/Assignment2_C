@@ -441,7 +441,7 @@ int main(){
 
     print_memory_blocks();
 
-    //dw
+    //d
    
     
     //--
