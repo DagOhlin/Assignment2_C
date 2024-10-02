@@ -7,6 +7,8 @@
 // the code can not handle combining a free block and end of pool so i just start with 
 // a free block the size of the pool but the code for a free pool still workes  
 //half of the code is useless now but meh
+
+//the free has a find block wich checks for invalid addreses maby add that to the others? 
 #include <stddef.h>
 /*
 typedef struct 
@@ -277,7 +279,7 @@ void* mem_resize(void* block, size_t size){
     
     printf("mem_resize\n");
 
-    int blockIndex;
+    int blockIndex = -1;
 
     for (int i = 0; i < memoryBlocksSize; i++)
     {
@@ -290,6 +292,14 @@ void* mem_resize(void* block, size_t size){
         }
     }    
 
+    if(blockIndex == -1){
+
+        printf("could not find block with adress to resize\n");
+        return NULL;
+
+
+    }
+
     if(memoryBlocks[blockIndex].size == size){
         printf("block was already that size\n");
         return block; 
@@ -298,11 +308,11 @@ void* mem_resize(void* block, size_t size){
 
     if(memoryBlocks[blockIndex].size < size){
         printf("new size is larger than old one\n");
-        
+         
         if(blockIndex < memoryBlocksSize - 1 && memoryBlocks[blockIndex + 1].isUsed == false 
         && memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size >= size){
             printf("the next block is free and new size can fit in the two combined\n");
-            
+            //why this part is done diffently from looking at the previus block is to avoid unnecesary looping 
             memoryBlocks[blockIndex + 1].size = memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size - size;
             memoryBlocks[blockIndex].size = size;
             memoryBlocks[blockIndex + 1].startAdress = memoryBlocks[blockIndex].size + memoryBlocks[blockIndex].startAdress;
@@ -324,6 +334,40 @@ void* mem_resize(void* block, size_t size){
             //this risks creating 0 size blocks which should be fine and will disaprear with time but will make iteration longer for no reason
         }
 
+        //checks if previus block or previus and next block are free and together can ancomadate the resize
+
+        size_t availvble_size = memoryBlocks[blockIndex].size;
+
+        if(blockIndex > 0 && memoryBlocks[blockIndex - 1].isUsed == false){
+            printf("block to the left is free\n");
+            availvble_size += memoryBlocks[blockIndex - 1].size;
+
+            if(blockIndex < memoryBlocksSize - 1 && memoryBlocks[blockIndex + 1].isUsed == false){
+                printf("block to the left and right is free\n");
+                availvble_size += memoryBlocks[blockIndex + 1].size;
+            }
+
+        }
+
+        //printf("availvble_size: %d\n", availvble_size);
+
+        if(availvble_size >= size){
+
+
+            printf("resized block can fit using left block or left and right block\n");
+            mem_free(block);
+            void* newBlock = mem_alloc(size);
+
+            if(newBlock == block){
+                printf("new bock same as old one, new size\n");
+                return block;
+            }
+
+            memcpy(newBlock, block, size);
+            return newBlock;
+        }
+
+        //checks if there are any other spotts in the pool it would fit 
         if(blockIndex == memoryBlocksSize - 1 && size - memoryBlocks[blockIndex].size <= sizeLeftAtEndOfPool()){
             printf("block is last one and end of pool is enough expanding size\n");
             memoryBlocks[blockIndex].size = size;
@@ -380,26 +424,29 @@ int main(){
 
     print_memory_blocks();
 
-    void* x = mem_alloc(50);
-    void* y = mem_alloc(50);
-    mem_free(y);
-
-    print_memory_blocks();
     
-
-    mem_resize(x, 80);
-
+    void* x = mem_alloc(40);
+    void* y = mem_alloc(40);
+    void* z = mem_alloc(20);
     print_memory_blocks();
 
-   
-
+    mem_free(x);
     
+
+    print_memory_blocks();
+
+    y = mem_resize(y, 70);
+
+    mem_free(z);
+
+    print_memory_blocks();
+
     
    
     
     //---
 
-    
+    mem_deinit();
 
     getchar();
     
