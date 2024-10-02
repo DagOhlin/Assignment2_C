@@ -1,37 +1,48 @@
-# Define the compiler
+# Compiler and Linking Variables
 CC = gcc
+CFLAGS = -Wall -fPIC
+LIB_NAME = libmemory_manager.so
 
-# Define compiler flags
-CFLAGS = -Wall -g -pthread
+# Source and Object Files
+SRC = memory_manager.c
+OBJ = $(SRC:.c=.o)
 
-# Define the target executable
-TARGET = memoryManager
+# Default target
+all: mmanager list test_mmanager test_list
 
-# Define the source files
-SRCS = memory_manager.c
+# Rule to create the dynamic library
+$(LIB_NAME): $(OBJ)
+	$(CC) -shared -o $@ $(OBJ)
 
-# Define the object files
-OBJS = $(SRCS:.c=.o)
-
-# The default target that will be built when "make" is run
-all: $(TARGET)
-
-# Rule to compile the target executable from the object files
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# Rule to compile .c files into .o files
+# Rule to compile source files into object files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean up the build (remove object files and executable)
+# Build the memory manager
+mmanager: $(LIB_NAME)
+
+# Build the linked list
+list: linked_list.o
+
+# Test target to run the memory manager test program
+test_mmanager: $(LIB_NAME)
+	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager
+
+# Test target to run the linked list test program
+test_list: $(LIB_NAME) linked_list.o
+	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager
+	
+#run tests
+run_tests: run_test_mmanager run_test_list
+	
+# run test cases for the memory manager
+run_test_mmanager:
+	./test_memory_manager
+
+# run test cases for the linked list
+run_test_list:
+	./test_linked_list
+
+# Clean target to clean up build files
 clean:
-	rm -f $(OBJS) $(TARGET)
-
-# Run the program
-run: $(TARGET)
-	./$(TARGET)
-
-# Run the program
-runt: $(TARGET)
-	time ./$(TARGET)
+	rm -f $(OBJ) $(LIB_NAME) test_memory_manager test_linked_list linked_list.o
