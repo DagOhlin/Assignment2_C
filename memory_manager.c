@@ -298,6 +298,7 @@ void* mem_resize(void* block, size_t size){
 
     if(memoryBlocks[blockIndex].size < size){
         printf("new size is larger than old one\n");
+        
         if(blockIndex < memoryBlocksSize - 1 && memoryBlocks[blockIndex + 1].isUsed == false 
         && memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size >= size){
             printf("the next block is free and new size can fit in the two combined\n");
