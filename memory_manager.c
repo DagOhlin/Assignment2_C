@@ -15,7 +15,7 @@ Done: add char cast to all ponter calcuations to avoid issues
 
 Done: the free has a find block wich checks for invalid addreses maby add that to the others? 
 
-fix that the increadsememarrysize can fail without it func that called stoping 
+Done: fix that the increadsememarrysize can fail without it func that called stoping 
 
 add comments to everything 
 
@@ -25,9 +25,27 @@ add comments to everything
 
 */
 
-//general documetation for program neeeded 
 
+/*
+general info for memory_manager  
 
+the data struckture for keeping track of the memoryblocks is a struckt 
+
+typedef struct {
+    void* startAdress;
+    size_t size;
+    bool isUsed;
+} memoryBlock;
+
+-it keeps track of the where every block starts, the size(in bytes) and if it is in use
+-the structs are stored in an array "memoryBlocks" 
+-after mem_inti the pool starts of with one big block that is empty(isUsed = false)
+-the method for allocation of blocks is "first fit" so the alloc uses the first free block it can 
+find(searching from left to right) and uses as much of it as it need, spliting of the rest to be used later
+-the manager avoids fragmentation of free memoryblocks by always combining them when they are freed (mem_free())
+this makes sure that there are never two free blocks next to eachother 
+
+*/
 
 // global vars are static to avoid access from other files 
 //vars for the memorypool
@@ -50,6 +68,7 @@ void print_memory_blocks() {
 
 //this function is called by other funcs when a new memoryblock is added 
 //it uses realloc to add the amunt of block specefied in BlocksToAdd
+//returns 0 on succses -1 on failure 
 int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
 
@@ -101,11 +120,11 @@ void mem_init(size_t size){
 
 }
 
-//mem_free frees the block that "block" is the starting addres for and sets it to isUsed = false so it can be used agian
+//mem_free frees the block that "block" is the starting address for and sets it to isUsed = false so it can be used agian
 //to avoid fragmentation of free blocks it also looks for adjacent free blocks and combines them
 //because this is done every time a block is freed there can never be free blocks next to eachother
 //making shure that the mem_alloc and mem_resize can easilly look through the pool for availabe blocks   
-//because it is a void func it can t tell the user if the operation failed 
+//because it is a void func it can t tell the user if the operation has failed 
 void mem_free(void* block){
 
     printf("mem_free\n");
@@ -219,7 +238,7 @@ void* mem_alloc(size_t size){
                 printf("memoryblock is larger than needed will split in two\n");
                 //the increaseMemoryBlockArraySize func increases memoryBlocksSize aswell so it is not nessary in this func
                 int arrayIncraseReturn = increaseMemoryBlockArraySize(&memoryBlocks, 1);
-
+                //checks so the increaseMemoryBlockArraySize worked
                 if(arrayIncraseReturn != 0){
                     //resets the block being in use to false 
                     memoryBlocks[i].isUsed = true;
@@ -462,7 +481,7 @@ int main(){
     printf("memoryBlocksSize: %d\n", memoryBlocksSize);
    
     //--
-
+    print_memory_blocks();
     mem_deinit();
 
     getchar();
@@ -470,4 +489,3 @@ int main(){
     return 0;
     
 }
-

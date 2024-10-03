@@ -4,16 +4,21 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <stdbool.h>  
 #include "common_defs.h"
 #include <stdint.h>
-//yeah might be nessesary to add a bunch of null checks for the params but there is now way to comunicate that to user anyways so it will make no differece
+
+
 /*
-typedef struct{
-    uint16_t data; // Stores the data as an unsigned 16-bit integer
-    struct Node* next; // A pointer to the next node in the List
-} Node;
+you got things to do list:
+
+yeah might be nessesary to add a bunch of null checks for the params but there is now way to comunicate that to user anyways so it will make no differece
+
+add comments to everything 
+
 */
+
+
 //------------------interaction funks------------------
 void list_init(Node** head, size_t size){
     printf("*list_init\n");
@@ -61,9 +66,9 @@ void list_insert(Node** head, int data){
 
 void list_insert_after(Node* prev_node, int data){
     printf("*list_insert_after\n");
-    //do i need to check that the node pointer is to an actual node?
+    
 
-
+    //this is a big problem because the func has no way of telling the user the operation failed
     if(prev_node == NULL){
         return;
     }
@@ -105,6 +110,7 @@ void list_insert_before(Node** head, Node* next_node, int data){
         *head = newNode;
         return;
     }
+
     Node* prevNode = *head;
     while (prevNode != NULL && prevNode->next != next_node)
     {
@@ -232,7 +238,7 @@ void list_display(Node** head){
     }
 
     Node* Current = *head;
-     printf("[");
+    printf("[");
     while (Current != NULL)
     { 
         printf("%d", Current->data);
