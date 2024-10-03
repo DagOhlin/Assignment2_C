@@ -259,7 +259,7 @@ void list_display_range(Node** head, Node* start_node, Node* end_node){
     printf("[");
     Node* current = start_node;
     bool isFIrst = true;
-    bool startPrinting = false;
+    
 
     while (current != NULL) {
         
