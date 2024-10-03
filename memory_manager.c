@@ -12,6 +12,8 @@ remove all code using emty space in pool
 
 add char cast to all ponter calcuations to avoid issues 
 
+add comments to everything 
+
 
 */
 
@@ -25,14 +27,7 @@ add char cast to all ponter calcuations to avoid issues
 
 //the free has a find block wich checks for invalid addreses maby add that to the others? 
 #include <stddef.h>
-/*
-typedef struct 
-{
-    void* startAdress;
-    size_t size;
-    bool isUsed;
-} memoryBlock;
-*/
+
 // should these be static instead and mabey inside a funkj?
 //does not handle 0 size alocation like the test wants 
 void* memPoolStart = NULL;
@@ -69,18 +64,7 @@ void increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
     *array = temp;
 }
 
-size_t sizeLeftAtEndOfPool() {
-    if (memoryBlocksSize == 0) {
-        
-        return memPoolSize;
-    } else {
-       //om du glömt bort castar du till char för att en char är en byte och det är nödvändigt för att räkna med bytes
-       //vet ej dock om det behövs just här 
-        memoryBlock lastBlock = memoryBlocks[memoryBlocksSize - 1];
-        size_t usedSize = (char*)lastBlock.startAdress + lastBlock.size - (char*)memPoolStart;
-        return memPoolSize - usedSize;
-    }
-}
+
 
 void mem_init(size_t size){
     
@@ -187,86 +171,55 @@ void* mem_alloc(size_t size){
         printf("size was 0 returned null\n");
         
         return NULL;
-        
+            
     }
+    
+    
+    
+    
 
-    if(memoryBlocks == NULL){
-        
-        printf("first allocation started\n");
+    printf("trying to find existing block that fits\n");
 
-        if(size <= memPoolSize){
-            printf("allocation fits in mempool\n");
-            memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock));
-            memoryBlocksSize += 1;
-            memoryBlocks[memoryBlocksSize - 1].size = size;
-            memoryBlocks[memoryBlocksSize - 1].isUsed = true;
-            memoryBlocks[memoryBlocksSize - 1].startAdress = memPoolStart;
-            return memoryBlocks[memoryBlocksSize - 1].startAdress;
-        }
-        else{
-            printf("allocation does not fit in mempool\n");
-            return NULL;
-        }
-    }
-    else{
-        printf("adding to already used pool\n");
+    for (int i = 0; i < memoryBlocksSize; i++){
 
-        printf("trying to find existing block that fits\n");
+        if(memoryBlocks[i].isUsed == false && size <= memoryBlocks[i].size){
 
-        for (int i = 0; i < memoryBlocksSize; i++){
+            printf("found block that fits, it is number: %d\n", i);
+            
+            //memoryBlocks[i].size = size;
+            memoryBlocks[i].isUsed = true;
 
-            if(memoryBlocks[i].isUsed == false && size <= memoryBlocks[i].size){
+            if(memoryBlocks[i].size != size){
+                printf("memoryblock is larger than needed will split in two\n");
 
-                printf("found block that fits, it is number: %d\n", i);
-                //can t change size of block as that leavs a gap in the blocks for now 
-                //memoryBlocks[i].size = size;
-                memoryBlocks[i].isUsed = true;
+                increaseMemoryBlockArraySize(&memoryBlocks, 1);
 
-                if(memoryBlocks[i].size != size){
-                    printf("memoryblock is larger than needed will split in two\n");
+                if(i < memoryBlocksSize - 1){
 
-                    increaseMemoryBlockArraySize(&memoryBlocks, 1);
-
-                    if(i < memoryBlocksSize - 1){
-
-                        for (int j = memoryBlocksSize - 1; j > i + 1; j--){
-                        
-                            memoryBlocks[j] = memoryBlocks[j - 1];
-                        }
-
+                    for (int j = memoryBlocksSize - 1; j > i + 1; j--){
+                    
+                        memoryBlocks[j] = memoryBlocks[j - 1];
                     }
-                    //same thing here  do not know if the char cast is really nessesary think i do calcs with these elsewhere where i do not use it
-                    memoryBlocks[i + 1].startAdress = (char*)memoryBlocks[i].startAdress + size;
-                    memoryBlocks[i + 1].size = memoryBlocks[i].size - size;
-                    memoryBlocks[i + 1].isUsed = false;
-                    memoryBlocks[i].size = size;
+
                 }
-
-                
-                
-                return memoryBlocks[i].startAdress;
-
+                //same thing here  do not know if the char cast is really nessesary think i do calcs with these elsewhere where i do not use it
+                memoryBlocks[i + 1].startAdress = (char*)memoryBlocks[i].startAdress + size;
+                memoryBlocks[i + 1].size = memoryBlocks[i].size - size;
+                memoryBlocks[i + 1].isUsed = false;
+                memoryBlocks[i].size = size;
             }
 
-        }
-        printf("did not find exisiting pool that could be used\n");
-        printf("adding at end of already in use pool\n");
-
-        if(size <= sizeLeftAtEndOfPool()){
-            printf("allocation fits in end of mempool\n");
-
-            increaseMemoryBlockArraySize(&memoryBlocks, 1);
             
-            memoryBlocks[memoryBlocksSize - 1].size = size;
-            memoryBlocks[memoryBlocksSize - 1].isUsed = true;
-            memoryBlocks[memoryBlocksSize - 1].startAdress = (char*)memoryBlocks[memoryBlocksSize - 2].startAdress + memoryBlocks[memoryBlocksSize - 2].size;
-            return memoryBlocks[memoryBlocksSize - 1].startAdress;
-        }
-        else{
-            printf("allocation does not fit in end of mempool\n");
+            
+            return memoryBlocks[i].startAdress;
+
         }
 
     }
+    printf("did not find exisiting block that could be used\n");
+    
+
+    
 
     
 
@@ -383,11 +336,7 @@ void* mem_resize(void* block, size_t size){
         }
 
         //checks if there are any other spotts in the pool it would fit 
-        if(blockIndex == memoryBlocksSize - 1 && size - memoryBlocks[blockIndex].size <= sizeLeftAtEndOfPool()){
-            printf("block is last one and end of pool is enough expanding size\n");
-            memoryBlocks[blockIndex].size = size;
-            return block;
-        }   
+        
 
         
         printf("will try to find new block that fits\n");
@@ -456,9 +405,15 @@ int main(){
 
     print_memory_blocks();
 
-    //d
+    void* a = mem_alloc(5);
    
-    
+    print_memory_blocks();
+
+    mem_free(y);
+    print_memory_blocks();
+
+    y = mem_resize(a, 4);
+    print_memory_blocks();
     //--
 
     mem_deinit();
