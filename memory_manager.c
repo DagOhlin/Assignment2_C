@@ -4,6 +4,21 @@
 #include "memory_manager.h"
 #include"common_defs.h"
 #include <string.h>
+
+/*
+to fucking do list:
+
+remove all code using emty space in pool 
+
+add char cast to all ponter calcuations to avoid issues 
+
+
+*/
+
+
+
+
+
 // the code can not handle combining a free block and end of pool so i just start with 
 // a free block the size of the pool but the code for a free pool still workes  
 //half of the code is useless now but meh
@@ -437,7 +452,7 @@ int main(){
 
     y = mem_resize(y, 70);
 
-    mem_free(z);
+    //mem_free(z);
 
     print_memory_blocks();
 
