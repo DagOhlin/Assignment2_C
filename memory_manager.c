@@ -6,25 +6,8 @@
 #include <string.h>
 #include <stddef.h>
 
-/*
-to fucking do list:
 
-Done: remove all code using emty space in pool 
-
-Done: add char cast to all ponter calcuations to avoid issues 
-
-Done: the free has a find block wich checks for invalid addreses maby add that to the others? 
-
-Done: fix that the increadsememarrysize can fail without it func that called stoping 
-
-add comments to everything 
-
- 
-
-
-
-*/
-
+//Dag Ohlin
 
 /*
 general info for memory_manager  
@@ -463,30 +446,3 @@ void* mem_resize(void* block, size_t size){
 }
 
 
-int main(){
-
-    printf("Hello World!\n");
-
-    mem_init(100);
-
-    print_memory_blocks();
-
-    
-    void* x = mem_alloc(40);
-    void* y = mem_alloc(40);
-    void* z = mem_alloc(20);
-    print_memory_blocks();
-
-    mem_free(x);
-    
-    printf("memoryBlocksSize: %d\n", memoryBlocksSize);
-   
-    //--
-    print_memory_blocks();
-    mem_deinit();
-
-    getchar();
-    
-    return 0;
-    
-}
