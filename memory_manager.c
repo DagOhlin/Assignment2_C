@@ -155,6 +155,7 @@ void mem_free(void* block){
     // if the block is alreefy free it will fail, althoug the program would still work without this check  
     if(memoryBlocks[index].isUsed == false){
         printf("block is already freed\n");
+        return;
     }
 
     printf("Found block to free at index: %d\n", index);
