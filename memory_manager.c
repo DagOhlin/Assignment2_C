@@ -205,11 +205,11 @@ void mem_free(void* block){
 }
 
 
-//looks for unused blocks that fit "size" then sets them as in use.
+//looks for unused blocks that fit "size" then sets them as in use
 //the alloc uses first fit wich means that it will use the first free block in the pool from the left 
 //that can fit the "size"
 //if the free block the alloc has found is larger than needet the extra size att the end will become its own free block
-//basicly spliting the block in two to make sure no space is wasted 
+//basicly spliting the block in two to make sure no space is wasted
 //returns NULL if allocation fails 
 void* mem_alloc(size_t size){
     printf("mem_alloc\n");
