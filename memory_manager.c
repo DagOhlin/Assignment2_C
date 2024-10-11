@@ -292,7 +292,7 @@ void* mem_resize(void* block, size_t size){
     printf("mem_resize\n");
 
 
-    printf("mem_free\n");
+    
     //check so the address is valid 
     if (block == NULL) {
         printf("cant free is nullpointer\n");
