@@ -3,6 +3,7 @@
 
 #include <stddef.h>  // For size_t
 #include <stdbool.h> // For bool
+#include <pthread.h>
 
 // Struct definition for a memory block
 typedef struct {

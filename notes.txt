@@ -1,1 +1,8 @@
 he changed all the ints to the other int in the liked list 
+
+how do i have any controll over when one thread is writing and another is reading 
+i have 0 controll over when he acceses memory 
+
+remember to use mutex init and mutex destroy on the locks 
+
+use trylock to lock to not create deadlock when locking something twice 

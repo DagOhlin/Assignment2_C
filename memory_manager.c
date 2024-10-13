@@ -7,6 +7,7 @@
 #include <stddef.h>
 
 
+
 //Dag Ohlin
 
 /*
@@ -30,6 +31,11 @@ this makes sure that there are never two free blocks next to eachother
 
 */
 
+
+pthread_mutex_t universalLock = PTHREAD_MUTEX_INITIALIZER;
+
+
+
 // global vars are static to avoid access from other files 
 //vars for the memorypool
 static void* memPoolStart = NULL;
@@ -52,6 +58,8 @@ void print_memory_blocks() {
 //this function is called by other funcs when a new memoryblock is added 
 //it uses realloc to add the amunt of block specefied in BlocksToAdd
 //returns 0 on succses -1 on failure 
+//----thread safe-----
+//this is oly called fom a part of alloc that needs to be threadsafe anyways so no locking required 
 int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
 
@@ -76,6 +84,8 @@ int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
 // intializes the memorypool with malloc acording to size, creates the array 
 //for memoryblocks and creats one empty block that takes upp the entire array 
+//----thread safe-----
+//only called once at the start, not used in threads sp no thread saftey required 
 void mem_init(size_t size){
     //mempool setup
     printf("mem_init\n");
