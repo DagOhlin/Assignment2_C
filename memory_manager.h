@@ -13,6 +13,8 @@ typedef struct {
 
 // Function declarations
 
+void print_memory_blocks();
+
 void mem_init(size_t size);
 
 void* mem_alloc(size_t size);
