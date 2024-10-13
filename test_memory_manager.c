@@ -14,7 +14,12 @@ void* threadTestManager(void* address){
     printf_yellow("thread stared\n");
 
     void* x = mem_alloc(30);
-    mem_resize(x, 40);
+    x = mem_resize(x, 40);
+    void* y = mem_alloc(9);
+    y = mem_resize(y, 11);
+    y = mem_resize(y, 1);
+    mem_free(x);
+    mem_free(y);
     
     
     return NULL;
@@ -35,7 +40,7 @@ int main()
     pthread_create(&thread2, NULL, threadTestManager, NULL);
     printf("all threads created\n");
 
-    print_memory_blocks();
+    
     pthread_join(thread1, NULL);
     printf_green("thread1 done\n");
     

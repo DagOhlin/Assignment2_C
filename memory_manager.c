@@ -34,6 +34,9 @@ this makes sure that there are never two free blocks next to eachother
 
 pthread_mutex_t universalLock = PTHREAD_MUTEX_INITIALIZER;
 
+pthread_mutex_t recursiveLock;
+pthread_mutexattr_t attr;
+
 
 
 // global vars are static to avoid access from other files 
@@ -111,6 +114,12 @@ void mem_init(size_t size){
     memoryBlocks[memoryBlocksSize - 1].isUsed = false;
     memoryBlocks[memoryBlocksSize - 1].startAdress = memPoolStart;
 
+    //here i initalize the lock and set the recursie atribute 
+    pthread_mutexattr_init(&attr);
+    //I aparently need to use _NP at the end because PTHREAD_MUTEX_RECURSIVE is not supported, should still work on all linux though
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutex_init(&recursiveLock, &attr);
+
 }
 
 //mem_free frees the block that "block" is the starting address for and sets it to isUsed = false so it can be used agian
@@ -120,13 +129,18 @@ void mem_init(size_t size){
 //because it is a void func it can t tell the user if the operation has failed 
 void mem_free(void* block){
 
+    pthread_mutex_lock(&recursiveLock);
+
     printf("mem_free\n");
     //check so the address is valid 
     if (block == NULL) {
         printf("cant free is nullpointer\n");
+        pthread_mutex_unlock(&recursiveLock);
         return;
     }
 
+    
+    
     
     int index = -1;
     //forloop find the index of "block"
@@ -141,6 +155,7 @@ void mem_free(void* block){
     if(index == -1){
 
         printf("could not find block with adress to free\n");
+        pthread_mutex_unlock(&recursiveLock);
         return;
 
 
@@ -148,6 +163,7 @@ void mem_free(void* block){
     // if the block is alreefy free it will fail, althoug the program would still work without this check  
     if(memoryBlocks[index].isUsed == false){
         printf("block is already freed\n");
+        pthread_mutex_unlock(&recursiveLock);
         return;
     }
 
@@ -194,7 +210,8 @@ void mem_free(void* block){
     
     }
 
-
+    pthread_mutex_unlock(&recursiveLock);
+    return;
 }
 
 
@@ -205,6 +222,8 @@ void mem_free(void* block){
 //basicly spliting the block in two to make sure no space is wasted
 //returns NULL if allocation fails 
 void* mem_alloc(size_t size){
+
+    
     printf("mem_alloc\n");
     //checks so the user is not trying to create a block with 0 bytes
     //it would be useless so returns NULL 
@@ -214,7 +233,8 @@ void* mem_alloc(size_t size){
         return NULL;
             
     }
-    
+    //size is not global
+    pthread_mutex_lock(&recursiveLock);
 
     printf("trying to find existing block that fits\n");
     // loops through all of the blocks untill it find one that fits with the if statment 
@@ -238,6 +258,7 @@ void* mem_alloc(size_t size){
                     memoryBlocks[i].isUsed = true;
                     printf("increase of memoryBlockArray faild so allocation fails\n");
                     printf("returns NULL\n");
+                    pthread_mutex_unlock(&recursiveLock);
                     return NULL;
                 }
 
@@ -257,7 +278,7 @@ void* mem_alloc(size_t size){
             }
 
             
-            
+            pthread_mutex_unlock(&recursiveLock);
             return memoryBlocks[i].startAdress;
 
         }
@@ -272,6 +293,7 @@ void* mem_alloc(size_t size){
     //returns NULL if no block that fit was found 
     
     printf("returns nullpointer\n");
+    pthread_mutex_unlock(&recursiveLock);
     return NULL;
 }
 
@@ -290,6 +312,10 @@ void mem_deinit(){
 
     memoryBlocksSize = 0;
     memPoolSize = 0;
+    //Destroys the locks wich is not really nesseary for a program that exits right after but here the user can do another pool afterwards 
+    //which would create new locks 
+    pthread_mutex_destroy(&recursiveLock);
+    pthread_mutexattr_destroy(&attr);
     return;
 }
 
@@ -299,13 +325,15 @@ void mem_deinit(){
 //returns NULL if allocation fails 
 void* mem_resize(void* block, size_t size){
     
+    pthread_mutex_lock(&recursiveLock);
     printf("mem_resize\n");
 
-
+    
     
     //check so the address is valid 
     if (block == NULL) {
         printf("cant free is nullpointer\n");
+        pthread_mutex_unlock(&recursiveLock);
         return NULL;
     }
     //forloop find the index of "block"
@@ -325,11 +353,13 @@ void* mem_resize(void* block, size_t size){
     if(blockIndex == -1){
 
         printf("could not find block with adress to resize\n");
+        pthread_mutex_unlock(&recursiveLock);
         return NULL;
     }
     //checks if the new size is same as old one, if so it just retunrs the address of "block"
     if(memoryBlocks[blockIndex].size == size){
         printf("block was already that size\n");
+        pthread_mutex_unlock(&recursiveLock);
         return block; 
     }
 
@@ -361,6 +391,7 @@ void* mem_resize(void* block, size_t size){
             }
             
             //returns  "block" as startaddress did not change 
+            pthread_mutex_unlock(&recursiveLock);
             return block;
             
         }
@@ -396,11 +427,13 @@ void* mem_resize(void* block, size_t size){
             //checks if the mem_alloc used the sam startaddress, then no memcopy is needed and "block" can be returned 
             if(newBlock == block){
                 printf("new bock same as old one, new size\n");
+                pthread_mutex_unlock(&recursiveLock);
                 return block;
             }
             //copies the data/bytes form the old one to the new one  
             memcpy(newBlock, block, oldBlockSize);
             //returns the addres of the new block 
+            pthread_mutex_unlock(&recursiveLock);
             return newBlock;
         }
 
@@ -415,7 +448,7 @@ void* mem_resize(void* block, size_t size){
         //checks if the alloc failed 
         if(newBockAdress == NULL){
             printf("there was no other spot that fit, returns null\n");
-           
+            pthread_mutex_unlock(&recursiveLock);
             return NULL;
         } 
 
@@ -425,6 +458,7 @@ void* mem_resize(void* block, size_t size){
         //frees the old block 
         mem_free(block);
         printf("copied over data and freed old block will now return new adress\n");
+        pthread_mutex_unlock(&recursiveLock);
         return newBockAdress;
         
 
@@ -441,15 +475,18 @@ void* mem_resize(void* block, size_t size){
 
         if(newBlock == block){
             printf("new bock same as old one, just smaller size\n");
+            pthread_mutex_unlock(&recursiveLock);
             return block;
         }
 
         memcpy(newBlock, block, size);
+        pthread_mutex_unlock(&recursiveLock);
         return newBlock;
         
     }
     //if all alternatives have failed we retun NULL
     printf("resize failed\n");
+    pthread_mutex_unlock(&recursiveLock);
     return NULL;
 
     

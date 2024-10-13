@@ -6,3 +6,5 @@ i have 0 controll over when he acceses memory
 remember to use mutex init and mutex destroy on the locks 
 
 use trylock to lock to not create deadlock when locking something twice 
+
+https://www.youtube.com/watch?v=Ot-VR3jzQMY&t=1s recursive locks 
