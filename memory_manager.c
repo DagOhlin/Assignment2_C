@@ -117,7 +117,7 @@ void mem_init(size_t size){
     //here i initalize the lock and set the recursie atribute 
     pthread_mutexattr_init(&attr);
     //I aparently need to use _NP at the end because PTHREAD_MUTEX_RECURSIVE is not supported, should still work on all linux though
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&recursiveLock, &attr);
 
 }

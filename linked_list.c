@@ -7,8 +7,11 @@
 #include <stdbool.h>  
 #include "common_defs.h"
 #include <stdint.h>// for the uint16_t int
+#include <pthread.h>
 
 //Dag Ohlin
+
+pthread_rwlock_t rwlock; 
 
 
 //------------------interaction funks------------------

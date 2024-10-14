@@ -18,8 +18,7 @@ void* threadTestManager(void* address){
     void* y = mem_alloc(9);
     y = mem_resize(y, 11);
     y = mem_resize(y, 1);
-    mem_free(x);
-    mem_free(y);
+    
     
     
     return NULL;
