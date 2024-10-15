@@ -13,3 +13,5 @@ i will try to use read write locks for the linked list
 they should not cause any problems 
 
 cntrl shift p then c/c++ config ui and change c standard to gnu17
+
+the is aparently a mem move funk that i can use instead of all the for loops 

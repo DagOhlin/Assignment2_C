@@ -9,6 +9,81 @@
 
 
 
+
+
+#define TOTAL_ITERATIONS 100000  // Total number of iterations, regardless of number of threads
+
+void* threadTestManager(void* arg) {
+    int iterations = *(int*)arg;  // Each thread gets its number of iterations
+
+    int iterationsCount = 0;
+    for (int i = 0; i < iterations; i++) {
+        void* x = mem_alloc(30);
+        //x = mem_resize(x, 40);
+        void* y = mem_alloc(9);
+        //y = mem_resize(y, 11);
+        //y = mem_resize(y, 1);
+        mem_free(y);
+        mem_free(x);
+        
+        iterationsCount++;
+    }
+    printf("iterations: %d\n", iterationsCount);
+    printf_red("finnished\n");
+
+    return NULL;
+}
+
+double get_time_diff(struct timespec start, struct timespec end) {
+    double start_sec = (double)start.tv_sec + (double)start.tv_nsec / 1e9;
+    double end_sec = (double)end.tv_sec + (double)end.tv_nsec / 1e9;
+    return end_sec - start_sec;
+}
+
+int main() {
+    struct timespec start_time, end_time;
+    double single_thread_time, multi_thread_time;
+    pthread_t thread1, thread2;
+    int iterations_per_thread;
+    int total_iterations = TOTAL_ITERATIONS;
+
+    // Single-threaded test
+    mem_init(1000000); // Initialize with a larger pool size
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+
+    // Run the test function in the main thread with TOTAL_ITERATIONS
+    threadTestManager(&total_iterations);
+
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    single_thread_time = get_time_diff(start_time, end_time);
+    
+    mem_deinit();
+    printf_green("---------------\n");
+    // Multi-threaded test
+    mem_init(1000000); // Re-initialize the memory pool
+    iterations_per_thread = TOTAL_ITERATIONS / 2;  // Divide the total iterations between 2 threads
+
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+
+    pthread_create(&thread1, NULL, threadTestManager, &iterations_per_thread);
+    pthread_create(&thread2, NULL, threadTestManager, &iterations_per_thread);
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+    multi_thread_time = get_time_diff(start_time, end_time);
+    printf("Multi-threaded test time: %f seconds\n", multi_thread_time);
+    printf("Single-threaded test time: %f seconds\n", single_thread_time);
+    print_memory_blocks();
+    mem_deinit();
+
+    return 0;
+}
+
+
+
+/*
 void* threadTestManager(void* address){
     
     printf_yellow("thread stared\n");
@@ -52,3 +127,4 @@ int main()
     
     return 0;
 }
+*/
