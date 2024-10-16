@@ -5,6 +5,7 @@
 #include"common_defs.h"//for nice colors 
 #include <string.h>
 #include <stddef.h>
+#include <assert.h>
 
 
 
@@ -161,8 +162,12 @@ void mem_free(void* block){
     }
     // if index is still -1 after search it will fail because the block with coresponding startadress was not fond 
     if(index == -1){
-
-        printf("could not find block with adress to free\n");
+        printf("allocs: %d\n", allocs);
+        printf("frees: %d\n", frees);
+        printf_red("could not find block with adress to free\n");
+        printf_red("startAdress=%p\n", block);
+        print_memory_blocks();
+        //assert(0 && "________________");
         pthread_mutex_unlock(&universalLock);
         return;
 
@@ -171,8 +176,12 @@ void mem_free(void* block){
     
     // if the block is alreefy free it will fail, althoug the program would still work without this check  
     if(memoryBlocks[index].isUsed == false){
-        printf("block is already freed\n");
-        printf("Block %d: startAdress=%p, size=%zu, isUsed=%s\n", index, memoryBlocks[index].startAdress, memoryBlocks[index].size, memoryBlocks[index].isUsed ? "true" : "false");
+        printf("allocs: %d\n", allocs);
+        printf("frees: %d\n", frees);
+        printf_red("block is already freed\n");
+        printf_red("Block %d: startAdress=%p, size=%zu, isUsed=%s\n", index, block, memoryBlocks[index].size, memoryBlocks[index].isUsed ? "true" : "false");
+        print_memory_blocks();
+        //assert(0 && "________________");
         pthread_mutex_unlock(&universalLock);
         return;
     }
@@ -233,7 +242,7 @@ void mem_free(void* block){
 //returns NULL if allocation fails 
 void* mem_alloc(size_t size){
     
-    
+    pthread_mutex_lock(&universalLock);
     //printf("mem_alloc\n");
     //checks so the user is not trying to create a block with 0 bytes
     //it would be useless so returns NULL 
@@ -244,7 +253,7 @@ void* mem_alloc(size_t size){
             
     }
     //size is not global
-    pthread_mutex_lock(&universalLock);
+    
     allocs++;
     //printf("trying to find existing block that fits\n");
     // loops through all of the blocks untill it find one that fits with the if statment 
@@ -265,7 +274,7 @@ void* mem_alloc(size_t size){
                 //checks so the increaseMemoryBlockArraySize worked
                 if(arrayIncraseReturn != 0){
                     //resets the block being in use to false 
-                    memoryBlocks[i].isUsed = true;
+                    memoryBlocks[i].isUsed = false;
                     //printf("increase of memoryBlockArray faild so allocation fails\n");
                     //printf("returns NULL\n");
                     pthread_mutex_unlock(&universalLock);
@@ -273,7 +282,7 @@ void* mem_alloc(size_t size){
                 }
 
                 if(i < memoryBlocksSize - 1){
-
+                    
                     for (int j = memoryBlocksSize - 1; j > i + 1; j--){
                     
                         memoryBlocks[j] = memoryBlocks[j - 1];
@@ -287,6 +296,41 @@ void* mem_alloc(size_t size){
                 memoryBlocks[i].size = size;
             }
 
+            //dubug stuff
+
+            if (memoryBlocks[i].isUsed == false)
+            {
+                printf_red("block is already freed\n");
+                printf_red("Block %d: startAdress=%p, size=%zu, isUsed=%s\n", i, memoryBlocks[i].startAdress, memoryBlocks[i].size, memoryBlocks[i].isUsed ? "true" : "false");
+                print_memory_blocks();
+                assert(0 && "________________");
+            }
+
+            int index = -1;
+            //forloop find the index of "block"
+            for (int e = 0; e < memoryBlocksSize; e++)
+            {
+                if(memoryBlocks[e].startAdress == memoryBlocks[i].startAdress){
+                    index = e;
+                    break;
+                }
+            }
+            // if index is still -1 after search it will fail because the block with coresponding startadress was not fond 
+            if(index == -1){
+                printf("allocs: %d\n", allocs);
+                printf("frees: %d\n", frees);
+                printf_red("could not find block that is going to be returned in alloc\n");
+                printf_red("startAdress=%p\n", memoryBlocks[i].startAdress);
+                print_memory_blocks();
+                assert(0 && "________________");
+                pthread_mutex_unlock(&universalLock);
+                return NULL;
+
+
+            }
+                    
+
+            //end of debug stuff
             
             pthread_mutex_unlock(&universalLock);
             return memoryBlocks[i].startAdress;
