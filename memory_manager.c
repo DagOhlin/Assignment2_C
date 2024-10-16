@@ -275,8 +275,9 @@ void* mem_alloc(size_t size){
                 if(arrayIncraseReturn != 0){
                     //resets the block being in use to false 
                     memoryBlocks[i].isUsed = false;
-                    //printf("increase of memoryBlockArray faild so allocation fails\n");
-                    //printf("returns NULL\n");
+                    printf("increase of memoryBlockArray faild so allocation fails\n");
+                    printf("returns NULL\n");
+                    assert(0 && "________________");
                     pthread_mutex_unlock(&universalLock);
                     return NULL;
                 }
@@ -347,6 +348,7 @@ void* mem_alloc(size_t size){
     //returns NULL if no block that fit was found 
     
     //printf("returns nullpointer\n");
+    assert(0 && "found no block that fit will return 0");
     pthread_mutex_unlock(&universalLock);
     return NULL;
 }

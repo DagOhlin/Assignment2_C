@@ -97,7 +97,7 @@ int main() {
 
 
 
-#define TOTAL_ITERATIONS 10000  
+#define TOTAL_ITERATIONS 100000  
 
 void* threadTestManager(void* arg) {
     int iterations = *(int*)arg;  
@@ -113,11 +113,15 @@ void* threadTestManager(void* arg) {
         
         
         void* y = mem_alloc(1);
-        if (x == NULL){
+        if (y == NULL){
             assert(0 && "returned addres is null");
         }
 
         if (x == y){
+            
+            printf_red("startAdressX=%p\n", x);
+            printf_red("startAdressY=%p\n", y);
+            print_memory_blocks();
             assert(0 && "x = y");
         }
         
@@ -165,7 +169,7 @@ int main() {
 
     printf_green("---------------\n");
     // Multi-threaded test
-    mem_init(10); // Re-initialize the memory pool
+    mem_init(1000000); // Re-initialize the memory pool
     iterations_per_thread = TOTAL_ITERATIONS / 2;  // Divide the total iterations between 2 threads
 
     clock_gettime(CLOCK_MONOTONIC, &start_time);
