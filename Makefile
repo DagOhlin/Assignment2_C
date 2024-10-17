@@ -1,6 +1,6 @@
 # Compiler and Linking Variables
 CC = gcc
-CFLAGS = -Wall -fPIC -lm
+CFLAGS = -Wall -fPIC -lm -fsanitize=thread
 LIB_NAME = libmemory_manager.so
 
 # Source and Object Files
@@ -26,19 +26,20 @@ list: linked_list.o
 
 # Test target to build the memory manager test program
 test_mmanager: $(LIB_NAME)
-	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm
+	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm -g -fsanitize=thread
 
 # Test target to build the linked list test program
 test_list: $(LIB_NAME) linked_list.o
-	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager -lm
+	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager -lm -g 
 	
 # Run all tests
 run_tests: run_test_mmanager run_test_list
 
 # Run test cases for the memory manager
 run_test_mmanager: test_mmanager
-	LD_LIBRARY_PATH=. ./test_memory_manager 0 
+	LD_LIBRARY_PATH=. ./test_memory_manager 
 #the 0 is for the arg in the main(arg) to select wich test it is suposed to run 
+#LD_LIBRARY_PATH=. valgrind --tool=helgrind ./test_memory_manager for hellgrind
 
 # Run test cases for the linked list
 run_test_list: test_list
