@@ -81,22 +81,6 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #define TOTAL_ITERATIONS 100000  
 
 void* threadTestManager(void* arg) {
@@ -167,7 +151,12 @@ int main() {
     print_memory_blocks();
     mem_deinit();
 
+
+
+
     printf_green("---------------\n");
+
+
     // Multi-threaded test
     mem_init(1000000); // Re-initialize the memory pool
     iterations_per_thread = TOTAL_ITERATIONS / 2;  // Divide the total iterations between 2 threads

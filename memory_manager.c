@@ -8,7 +8,7 @@
 #include <assert.h>
 
 
-
+ 
 //Dag Ohlin
 
 /*
@@ -32,7 +32,7 @@ this makes sure that there are never two free blocks next to eachother
 
 */
 
-
+//this will not rerun after i have destroyed it in deenit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 pthread_mutex_t universalLock = PTHREAD_MUTEX_INITIALIZER;
 
 pthread_mutex_t recursiveLock;
@@ -370,8 +370,8 @@ void mem_deinit(){
     memPoolSize = 0;
     //Destroys the locks wich is not really nesseary for a program that exits right after but here the user can do another pool afterwards 
     //which would create new locks 
-    pthread_mutex_destroy(&recursiveLock);
-    pthread_mutexattr_destroy(&attr);
+    //pthread_mutex_destroy(&recursiveLock);
+    //pthread_mutexattr_destroy(&attr);
 
     //debug stuff
     printf("allocs: %d\n", allocs);
