@@ -15,3 +15,5 @@ they should not cause any problems
 cntrl shift p then c/c++ config ui and change c standard to gnu17
 
 the is aparently a mem move funk that i can use instead of all the for loops 
+
+jag // ut my_assert(block1 != NULL); på rad 220 i mm test igen, 
