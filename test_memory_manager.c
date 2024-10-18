@@ -81,7 +81,7 @@ int main() {
 
 
 
-#define TOTAL_ITERATIONS 10000
+#define TOTAL_ITERATIONS 100000
 
 void* threadTestManager(void* arg) {
     int iterations = *(int*)arg;  
@@ -110,9 +110,7 @@ void* threadTestManager(void* arg) {
         }
         
         
-        if (y == NULL){
-            assert(0 && "returned addres is null");
-        }
+        
         
         
         

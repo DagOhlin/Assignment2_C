@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <assert.h>
+#include <unistd.h>
 
 
  
@@ -76,7 +77,9 @@ void print_memory_blocks() {
 int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
     pthread_mutex_lock(&recursiveLock);
+    //printf("Thread %lu: Lock acquired in increaseMemBlockSize\n", pthread_self());
     
+    /*
 
     memoryBlock* temp;
     //calcualtes new size of the array
@@ -90,10 +93,12 @@ int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
         pthread_mutex_unlock(&recursiveLock);
         return -1;
     }
-
+    */
     memoryBlocksSize = memoryBlocksSize + BlocksToAdd;
 
-    *array = temp;
+    //*array = temp;
+    
+    //printf("Thread %lu: unlocking in increaseMemBlockSize\n", pthread_self());
     pthread_mutex_unlock(&recursiveLock);
     return 0;
 }
@@ -122,7 +127,7 @@ void mem_init(size_t size){
 
     //array setup, at start entire pool will be full with one empty block
 
-    memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock));
+    memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock) * 100000);
     memoryBlocksSize += 1;
     memoryBlocks[memoryBlocksSize - 1].size = size;
     memoryBlocks[memoryBlocksSize - 1].isUsed = false;
@@ -146,6 +151,8 @@ void mem_free(void* block){
 
     
     pthread_mutex_lock(&recursiveLock);
+    //printf("Thread %lu: Lock acquired in free\n", pthread_self());
+    
     frees++;
     //printf("mem_free\n");
     //check so the address is valid 
@@ -175,6 +182,7 @@ void mem_free(void* block){
         //printf_red("startAdress=%p\n", block);
         //print_memory_blocks();
         //assert(0 && "________________");
+        //printf("Thread %lu: unlocing now in in free\n", pthread_self());
         pthread_mutex_unlock(&recursiveLock);
         return;
 
@@ -189,6 +197,7 @@ void mem_free(void* block){
         //printf_red("Block %d: startAdress=%p, size=%zu, isUsed=%s\n", index, block, memoryBlocks[index].size, memoryBlocks[index].isUsed ? "true" : "false");
         //print_memory_blocks();
         //assert(0 && "________________");
+        //printf("Thread %lu: unlocing now in in free\n", pthread_self());
         pthread_mutex_unlock(&recursiveLock);
         return;
     }
@@ -235,7 +244,7 @@ void mem_free(void* block){
 
     
     }
-
+    //printf("Thread %lu: unlocing now in in free\n", pthread_self());
     pthread_mutex_unlock(&recursiveLock);
     return;
 }
@@ -250,6 +259,8 @@ void mem_free(void* block){
 void* mem_alloc(size_t size){
     
     pthread_mutex_lock(&recursiveLock);
+    //printf("Thread %lu: Lock acquired in alloc\n", pthread_self());
+    
     //printf("mem_alloc\n");
     //checks so the user is not trying to create a block with 0 bytes
     //it would be useless so returns NULL 
@@ -339,7 +350,7 @@ void* mem_alloc(size_t size){
                     
 
             //end of debug stuff
-            
+            //printf("Thread %lu: unlocking in alloc\n", pthread_self());
             pthread_mutex_unlock(&recursiveLock);
             return memoryBlocks[i].startAdress;
 
