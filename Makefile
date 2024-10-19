@@ -1,6 +1,6 @@
 # Compiler and Linking Variables
 CC = gcc
-CFLAGS = -Wall -fPIC -lm -fsanitize=thread -g
+CFLAGS = -Wall -fPIC -lm  -g #-fsanitize=thread
 LIB_NAME = libmemory_manager.so
 
 # Source and Object Files
@@ -26,7 +26,8 @@ list: linked_list.o
 
 # Test target to build the memory manager test program
 test_mmanager: $(LIB_NAME)
-	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm -g -fsanitize=thread
+	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm -g 
+#$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm -g -fsanitize=thread
 
 # Test target to build the linked list test program
 test_list: $(LIB_NAME) linked_list.o
