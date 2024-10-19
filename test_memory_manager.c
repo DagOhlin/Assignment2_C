@@ -95,8 +95,10 @@ void* threadTestManager(void* arg) {
             assert(0 && "returned addres is null");
         }
         
-        
         void* y = mem_alloc(1);
+        
+
+        
         if (y == NULL){
             assert(0 && "returned addres is null");
         }

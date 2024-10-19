@@ -288,7 +288,11 @@ void* mem_alloc(size_t size){
             if(memoryBlocks[i].size != size){
                 //printf("memoryblock is larger than needed will split in two\n");
                 //the increaseMemoryBlockArraySize func increases memoryBlocksSize aswell so it is not nessary in this func
-                int arrayIncraseReturn = increaseMemoryBlockArraySize(&memoryBlocks, 1);
+                //int arrayIncraseReturn = increaseMemoryBlockArraySize(&memoryBlocks, 1);
+                //remove
+                int arrayIncraseReturn = 0;
+                memoryBlocksSize = memoryBlocksSize + 1;
+                //remove
                 //checks so the increaseMemoryBlockArraySize worked
                 if(arrayIncraseReturn != 0){
                     //resets the block being in use to false 
@@ -351,8 +355,10 @@ void* mem_alloc(size_t size){
 
             //end of debug stuff
             //printf("Thread %lu: unlocking in alloc\n", pthread_self());
+
+            void* toReturn = memoryBlocks[i].startAdress;
             pthread_mutex_unlock(&recursiveLock);
-            return memoryBlocks[i].startAdress;
+            return toReturn;
 
         }
 
