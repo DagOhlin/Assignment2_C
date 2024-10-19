@@ -37,7 +37,7 @@ run_tests: run_test_mmanager run_test_list
 
 # Run test cases for the memory manager
 run_test_mmanager: test_mmanager
-	LD_LIBRARY_PATH=. ./test_memory_manager 
+	LD_LIBRARY_PATH=. ./test_memory_manager 1
 #the 0 is for the arg in the main(arg) to select wich test it is suposed to run 
 #LD_LIBRARY_PATH=. valgrind --tool=helgrind ./test_memory_manager for hellgrind
 #LD_LIBRARY_PATH=. TSAN_OPTIONS="verbosity=2 log_path=tsan_log" ./test_memory_manager 

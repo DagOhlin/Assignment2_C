@@ -17,3 +17,7 @@ cntrl shift p then c/c++ config ui and change c standard to gnu17
 the is aparently a mem move funk that i can use instead of all the for loops 
 
 jag byte ut my_assert(block1 != NULL); mot my_assert(block1 == NULL); på rad 220 i mm test igen, 
+
+https://www.youtube.com/watch?v=vuXWqo_v_8U&t=1s
+
+https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags

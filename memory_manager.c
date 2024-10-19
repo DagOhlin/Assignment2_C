@@ -76,10 +76,10 @@ void print_memory_blocks() {
 //this is oly called fom a part of alloc that needs to be threadsafe anyways so no locking required 
 int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
 
-    pthread_mutex_lock(&recursiveLock);
+    //pthread_mutex_lock(&recursiveLock);
     //printf("Thread %lu: Lock acquired in increaseMemBlockSize\n", pthread_self());
     
-    /*
+    
 
     memoryBlock* temp;
     //calcualtes new size of the array
@@ -93,13 +93,13 @@ int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
         pthread_mutex_unlock(&recursiveLock);
         return -1;
     }
-    */
+    
     memoryBlocksSize = memoryBlocksSize + BlocksToAdd;
 
-    //*array = temp;
+    *array = temp;
     
     //printf("Thread %lu: unlocking in increaseMemBlockSize\n", pthread_self());
-    pthread_mutex_unlock(&recursiveLock);
+    //pthread_mutex_unlock(&recursiveLock);
     return 0;
 }
 
@@ -127,7 +127,7 @@ void mem_init(size_t size){
 
     //array setup, at start entire pool will be full with one empty block
 
-    memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock) * 100000);
+    memoryBlocks = (memoryBlock*)malloc(sizeof(memoryBlock));
     memoryBlocksSize += 1;
     memoryBlocks[memoryBlocksSize - 1].size = size;
     memoryBlocks[memoryBlocksSize - 1].isUsed = false;
@@ -263,11 +263,13 @@ void* mem_alloc(size_t size){
     
     //printf("mem_alloc\n");
     //checks so the user is not trying to create a block with 0 bytes
-    //it would be useless so returns NULL 
+    //it would be useless so returns just returns address of start of pool for now 
+    //would be better to return null but that is dependant on if the user sees alloc 0 as a error or not 
     if(size == 0){
         //printf("size was 0 returned null\n");
+        void* toReturn = memPoolStart;
         pthread_mutex_unlock(&recursiveLock);
-        return NULL;
+        return toReturn;
             
     }
     //size is not global
@@ -288,11 +290,8 @@ void* mem_alloc(size_t size){
             if(memoryBlocks[i].size != size){
                 //printf("memoryblock is larger than needed will split in two\n");
                 //the increaseMemoryBlockArraySize func increases memoryBlocksSize aswell so it is not nessary in this func
-                //int arrayIncraseReturn = increaseMemoryBlockArraySize(&memoryBlocks, 1);
-                //remove
-                int arrayIncraseReturn = 0;
-                memoryBlocksSize = memoryBlocksSize + 1;
-                //remove
+                int arrayIncraseReturn = increaseMemoryBlockArraySize(&memoryBlocks, 1);
+                
                 //checks so the increaseMemoryBlockArraySize worked
                 if(arrayIncraseReturn != 0){
                     //resets the block being in use to false 
@@ -320,7 +319,7 @@ void* mem_alloc(size_t size){
             }
 
             //dubug stuff
-
+            /*
             if (memoryBlocks[i].isUsed == false)
             {
                 printf_red("block is already freed\n");
@@ -352,7 +351,7 @@ void* mem_alloc(size_t size){
 
             }
                     
-
+            */
             //end of debug stuff
             //printf("Thread %lu: unlocking in alloc\n", pthread_self());
 
