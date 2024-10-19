@@ -21,3 +21,6 @@ jag byte ut my_assert(block1 != NULL); mot my_assert(block1 == NULL); på rad 22
 https://www.youtube.com/watch?v=vuXWqo_v_8U&t=1s
 
 https://github.com/google/sanitizers/wiki/ThreadSanitizerFlags
+
+in the linkeed list you are not destroying the lock 
+could i destroy it when it is locked mabey

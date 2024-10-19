@@ -2,7 +2,7 @@
 #include <stdlib.h>// the libarary for memory mangment(maloc free realloc)
 #include <stdbool.h>// for bools 
 #include "memory_manager.h"
-#include"common_defs.h"//for nice colors 
+
 #include <string.h>
 #include <stddef.h>
 #include <assert.h>
@@ -34,7 +34,7 @@ this makes sure that there are never two free blocks next to eachother
 */
 
 //this will not rerun after i have destroyed it in deenit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-pthread_mutex_t universalLock = PTHREAD_MUTEX_INITIALIZER;
+
 
 pthread_mutex_t recursiveLock;
 pthread_mutexattr_t attr;
@@ -50,10 +50,7 @@ static size_t memPoolSize = 0;
 static memoryBlock* memoryBlocks = NULL;
 static int memoryBlocksSize = 0;
 
-//debugvars 
 
-int allocs = 0;
-int frees = 0;
 
 //DebugFuncs
 
@@ -89,7 +86,7 @@ int increaseMemoryBlockArraySize(memoryBlock** array, size_t BlocksToAdd){
     
     //if handles when realloc fails temps is used to not lose address of array
     if(temp == NULL){
-        printf_red("resize of memoryBlocks failed\n");
+        //printf_red("resize of memoryBlocks failed\n");
         pthread_mutex_unlock(&recursiveLock);
         return -1;
     }
@@ -133,7 +130,7 @@ void mem_init(size_t size){
     memoryBlocks[memoryBlocksSize - 1].isUsed = false;
     memoryBlocks[memoryBlocksSize - 1].startAdress = memPoolStart;
 
-    pthread_mutex_init(&universalLock, NULL);
+    
     //here i initalize the lock and set the recursie atribute 
     pthread_mutexattr_init(&attr);
     //I aparently need to use _NP at the end because PTHREAD_MUTEX_RECURSIVE is not supported, should still work on all linux though
@@ -153,7 +150,7 @@ void mem_free(void* block){
     pthread_mutex_lock(&recursiveLock);
     //printf("Thread %lu: Lock acquired in free\n", pthread_self());
     
-    frees++;
+    
     //printf("mem_free\n");
     //check so the address is valid 
     if (block == NULL) {
@@ -274,7 +271,7 @@ void* mem_alloc(size_t size){
     }
     //size is not global
     
-    allocs++;
+    
     //printf("trying to find existing block that fits\n");
     // loops through all of the blocks untill it find one that fits with the if statment 
     for (int i = 0; i < memoryBlocksSize; i++){
@@ -397,11 +394,10 @@ void mem_deinit(){
     pthread_mutexattr_destroy(&attr);
 
     //debug stuff
-    printf("allocs: %d\n", allocs);
-    printf("frees: %d\n", frees);
+    //printf("allocs: %d\n", allocs);
+    //printf("frees: %d\n", frees);
     
-    frees = 0;
-    allocs = 0;
+    
 
 
     return;
