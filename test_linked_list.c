@@ -99,7 +99,7 @@ void test_list_insert_multithread(TestParams *params)
     {
         pthread_join(threads[i], NULL);
     }
-
+    printf("amount of nodes: %d, expexted amount: %d\n", list_count_nodes(&head), params->num_nodes);
     my_assert(list_count_nodes(&head) == params->num_nodes);
     // Verify and clean up
     // Note: Verification can be complex in multithreaded contexts due to node order variations
@@ -152,6 +152,7 @@ void test_list_insert_after_multithread(TestParams *params)
     }
 
     // Verify node count
+    printf("amount of nodes: %d, expexted amount: %d\n", list_count_nodes(&head), params->num_nodes + 1);
     my_assert(list_count_nodes(&head) == params->num_nodes + 1); // +1 for the initial node
 
     // Cleanup and pass message
@@ -210,8 +211,8 @@ void test_list_insert_before_multithreaded(TestParams *params)
     }
     //removed + 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! no dummy node
     // Optional: Verify the list structure, node count, etc.
-    int expected_count = params->num_threads + params->num_nodes; // Initial nodes + inserted nodes + head
-    //printf("amount of nodes: %d, expexted amount: %d\n", list_count_nodes(&head), expected_count);
+    int expected_count = params->num_threads + params->num_nodes + 1; // Initial nodes + inserted nodes + head
+    printf("amount of nodes: %d, expexted amount: %d\n", list_count_nodes(&head), expected_count);
     my_assert(list_count_nodes(&head) == expected_count);
     list_cleanup(&head);
     
