@@ -44,7 +44,7 @@ typedef struct
     bool simulate_work;
 } TestParams;
 
-// Function to calculate memory allocations for threads based on redistribution logic
+// Function to calculate memory allocations for threads based on redistribution logic,
 size_t *calculate_thread_allocations(int num_threads, size_t total_memory)
 {
     if (num_threads <= 0)
