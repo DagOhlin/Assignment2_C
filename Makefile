@@ -32,8 +32,6 @@ test_mmanager: $(LIB_NAME)
 # Test target to build the linked list test program
 test_list: $(LIB_NAME) linked_list.o
 	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager -lm -g -pthread 
-	cp test_linked_list test_linked_listCG
-	
 # Run all tests
 run_tests: run_test_mmanager run_test_list
 
@@ -47,7 +45,7 @@ run_test_mmanager: test_mmanager
 
 # Run test cases for the linked list
 run_test_list: test_list
-	LD_LIBRARY_PATH=. ./test_linked_list 0  # Run all tests by default
+	LD_LIBRARY_PATH=. valgrind ./test_linked_list 0  # Run all tests by default
 
 # Clean target to clean up build files
 clean:
