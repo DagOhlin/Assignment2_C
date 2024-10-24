@@ -451,7 +451,7 @@ void* mem_resize(void* block, size_t size){
     //separatly 
     if(memoryBlocks[blockIndex].size < size){
         //printf("new size is larger than old one\n");
-        //first if checks if we can resize by just using a free block to the riht, this allows us to not have to move data with memcpy
+        //first if checks if we can resize by just using a free block to the riht, this allows us to not have to move data with memmove
         //because the startaddres will stay the same and we can skip some unnesseary looping by not having to call mem_alloc 
         if(blockIndex < memoryBlocksSize - 1 && memoryBlocks[blockIndex + 1].isUsed == false 
         && memoryBlocks[blockIndex + 1].size + memoryBlocks[blockIndex].size >= size){
@@ -496,7 +496,7 @@ void* mem_resize(void* block, size_t size){
 
         }
         
-        //saves the size of the old block for use in memcpy
+        //saves the size of the old block for use in memmove
         size_t oldBlockSize = memoryBlocks[blockIndex].size;
 
         //checks availvble_size >= size to se if resize is posible  
@@ -515,7 +515,7 @@ void* mem_resize(void* block, size_t size){
                 return block;
             }
             //copies the data/bytes form the old one to the new one  
-            memcpy(newBlock, block, oldBlockSize);
+            memmove(newBlock, block, oldBlockSize);
             //returns the addres of the new block 
             pthread_mutex_unlock(&recursiveLock);
             return newBlock;
@@ -538,7 +538,7 @@ void* mem_resize(void* block, size_t size){
 
         //printf("found new block at new adress\n");
         //copies over the data 
-        memcpy(newBockAdress, block, oldBlockSize);
+        memmove(newBockAdress, block, oldBlockSize);
         //frees the old block 
         mem_free(block);
         //printf("copied over data and freed old block will now return new adress\n");
@@ -563,7 +563,7 @@ void* mem_resize(void* block, size_t size){
             return block;
         }
 
-        memcpy(newBlock, block, size);
+        memmove(newBlock, block, size);
         pthread_mutex_unlock(&recursiveLock);
         return newBlock;
         
