@@ -11,6 +11,18 @@
 
 //Dag Ohlin
 
+
+/*
+multithreading info for linked list 
+
+-the linked list uses one global "read write lock" to alow several threads to use linked list functions that only 
+read from the list
+-the lock is initialized in list_init and destroyed in list_cleanup 
+
+
+
+*/
+
 pthread_rwlock_t readWriteLock; 
 
 
@@ -287,7 +299,7 @@ void list_cleanup(Node** head){
 
     *head = NULL;
     pthread_rwlock_unlock(&readWriteLock);
-
+    pthread_mutex_destroy(&readWriteLock);
     
 }
 

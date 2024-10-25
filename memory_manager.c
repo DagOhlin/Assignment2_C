@@ -31,9 +31,18 @@ find(searching from left to right) and uses as much of it as it need, spliting o
 -the manager avoids fragmentation of free memoryblocks by always combining them when they are freed (mem_free())
 this makes sure that there are never two free blocks next to eachother 
 
+
+multithreading info for memory_manager
+
+-the memory manager uses one global lock to secure all functions that modefy the global memoryblocks array 
+and makes sure all operations are atomic 
+-the lock is initialized in mem_intit and destroyed in mem_deinit 
+-the global lock used is a recursive one to alow mem_resize to call mem_alloc and mem_free without a double lock causing a deadlock
+
+
 */
 
-//this will not rerun after i have destroyed it in deenit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
 pthread_mutex_t recursiveLock;
