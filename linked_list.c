@@ -299,7 +299,7 @@ void list_cleanup(Node** head){
 
     *head = NULL;
     pthread_rwlock_unlock(&readWriteLock);
-    pthread_mutex_destroy(&readWriteLock);
+    pthread_rwlock_destroy(&readWriteLock);
     
 }
 
