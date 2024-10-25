@@ -21,6 +21,10 @@ $(LIB_NAME): $(OBJ)
 # Build the memory manager
 mmanager: $(LIB_NAME)
 
+# Rule to build the linked list application and link with memory manager
+list: linked_list.o $(LIB_NAME)
+#$(CC) -o linked_list linked_list.o -L. -lmemory_manager -pthread -lm -g
+
 
 # Test target to build the memory manager test program
 test_mmanager: $(LIB_NAME)
@@ -32,9 +36,6 @@ test_list: $(LIB_NAME) linked_list.o
 	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager -lm -g -pthread 
 # Run all tests
 
-# Rule to build the linked list application and link with memory manager
-list: linked_list.o $(LIB_NAME)
-	$(CC) -o linked_list linked_list.o -L. -lmemory_manager -pthread -lm -g
 
 # Clean target to clean up build files
 clean:
