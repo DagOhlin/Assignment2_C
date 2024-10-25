@@ -22,7 +22,7 @@ $(LIB_NAME): $(OBJ)
 mmanager: $(LIB_NAME)
 
 # Rule to build the linked list application and link with memory manager
-list: linked_list.o $(LIB_NAME)
+list: linked_list.o #$(LIB_NAME)
 #$(CC) -o linked_list linked_list.o -L. -lmemory_manager -pthread -lm -g
 
 
